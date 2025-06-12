@@ -31,34 +31,17 @@
     <div v-if="isError" class="mt-10 text-red-500 uppercase text-base ">
 {{ errorPoruka }}
     </div>
-    <div class="flex flex-col gap-4  md:grid md:grid-cols-4 mt-5 space-y-4 sm:space-y-0 sm:p-5 xl:p-20">
-        <div v-for="(movie, index) in filtered" :key="index" class="text-white  md:p-4 bg-linear-to-b from-slate-400 to-slate-600 rounded-lg ">
-            <div class="flex sm:flex-row flex-col   sm:text-left overflow-hidden text-wrap md:gap-5  md:flex-col md:items-center ">
-
-           <img :src="`https://image.tmdb.org/t/p/w500${movie.poster_path}`" alt="" class="scale-90 md:w-64 rounded-lg">
-           <div class="p-2 md:p-4">
-            <h1 class="text-3xl md:text-4xl text-left  hover:text-blue-400 cursor-pointer">{{ movie.title }}</h1>
-            <div class="border-b-2 py-4 "></div>
-     
-            
-            
-        <div class="text-left">
-    <h1 class="text-lg uppercase mt-2 md:mt-10 md:text-xl mb-2" >Overview</h1>             
-<p class="text-sm md:text-base" >{{ movie.overview }}</p> 
-<div class="text-base">
-<p class="mt-5 "><span class="uppercase bg-slate-400  p-2 rounded-md">Release date: {{ movie.release_date }} </span></p>
-<p class="mt-5 mb-5 sm:mb-0"><span class="uppercase">Average Rating: </span>{{ (movie.vote_average).toFixed(1) }} ★</p></div>
-                </div>
-                </div>
-             </div>
-        </div>
-    </div>
+     <div>
+        <MovieCard :matchingMovies="matchingMovies"></MovieCard>
+     </div>
+ 
     </div>
    </div>
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted } from 'vue'
+import MovieCard from '@/components/MovieCard.vue';
 
 const ACCESS_TOKEN = import.meta.env.VITE_ACCESS_TOKEN;
 
@@ -72,8 +55,7 @@ const pickedGenres = ref([])
 
 const matchingMovies = ref([])
 
-const filtered = computed(()=>{
-    return matchingMovies.value.sort((a, b) => b.vote_average - a.vote_average)})
+
 
 
 function pickGenre(genre){
@@ -89,7 +71,7 @@ function pickGenre(genre){
    }
     
    
-    console.log(pickedGenres.value)
+
 }
 
 
@@ -107,10 +89,10 @@ const getGenres = async () =>{
             throw new Error(`HTTP Error: ${res.status}`)
         }
         const data = await res.json()
-        console.log(data)
+        
         allGenres.value = data.genres
     }  catch (e){
-        console.log('Error', e)
+        console.error('Error', e)
     }
 }
 const findMovies = async (genreIds) =>{
@@ -129,9 +111,9 @@ const findMovies = async (genreIds) =>{
     throw new Error(`HTTP Error: ${res.status}`)
     }
     const moviesData = await res.json()
-    console.log(moviesData)
+   /*  console.log(moviesData) */
     matchingMovies.value = moviesData.results
-    console.log(matchingMovies.value)
+    /* console.log(matchingMovies.value) */
 }   catch(e){
     console.error(e)
 
@@ -150,7 +132,7 @@ function getMovie(){
         const matchingGenre = allGenres.value.find(genre => genre.name === genreName)
         return matchingGenre.id 
         })
-       console.log(genreIds)
+       /* console.log(genreIds) */
 
       // call
       try{
