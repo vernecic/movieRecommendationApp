@@ -16,7 +16,7 @@
                  
 
     <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 p-2 sm:p-0 " >
-    <div v-for="genre in allGenres" :key="genre.id" class="text-white font-semibold  py-4 px-8 text-base uppercase  rounded-md text-center truncate shadow-lg cursor-pointer " @click="pickGenre(genre)" :class="pickedGenres?.includes(genre.name) ? 'bg-emerald-900' : 'bg-slate-500'">
+    <div v-for="genre in store.allGenres" :key="genre.id" class="text-white font-semibold  py-4 px-8 text-base uppercase  rounded-md text-center truncate shadow-lg cursor-pointer " @click="store.pickGenre(genre)" :class="store.pickedGenres?.includes(genre.name) ? 'bg-emerald-900' : 'bg-slate-500'">
         {{ genre.name }}
            
     </div>
@@ -42,14 +42,14 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import MovieCard from '@/components/MovieCard.vue';
+import { useMovieStore } from '@/stores/movieStore';
 
+const store = useMovieStore()
 const ACCESS_TOKEN = import.meta.env.VITE_ACCESS_TOKEN;
 
 const isError = ref(false)
 const errorPoruka = ref('')
 
-const allGenres = ref([])
-const pickedGenres = ref([])
 
 
 
@@ -58,21 +58,6 @@ const matchingMovies = ref([])
 
 
 
-function pickGenre(genre){
-   if(!pickedGenres.value.includes(genre.name)) {
-        if(pickedGenres.value.length < 4){
- pickedGenres.value.push(genre.name)
-   } 
-
-} else {   
-
-    const index = pickedGenres.value.indexOf(genre.name)
-   pickedGenres.value.splice(index, 1)
-   }
-    
-   
-
-}
 
 
 
@@ -90,7 +75,7 @@ const getGenres = async () =>{
         }
         const data = await res.json()
         
-        allGenres.value = data.genres
+        store.allGenres = data.genres
     }  catch (e){
         console.error('Error', e)
     }
@@ -121,15 +106,15 @@ const findMovies = async (genreIds) =>{
  }
 
 function getMovie(){
-    if(pickedGenres.value.length === 0){
+    if(store.pickedGenres.length === 0){
         isError.value = true;
         errorPoruka.value = 'No categories selected'
         return
     } else {
         isError.value = false
         
-        const genreIds = pickedGenres.value.map(genreName =>{
-        const matchingGenre = allGenres.value.find(genre => genre.name === genreName)
+        const genreIds = store.pickedGenres.map(genreName =>{
+        const matchingGenre = store.allGenres.find(genre => genre.name === genreName)
         return matchingGenre.id 
         })
        /* console.log(genreIds) */
